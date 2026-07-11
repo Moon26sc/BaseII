@@ -1,3 +1,5 @@
+//productoController.js
+
 const pool = require('../config/db');
 
 const obtenerProductos = async (req, res) => {
@@ -41,15 +43,15 @@ const actualizarProducto = async (req, res) => {
             
             result = await pool.query(
                 `UPDATE productos 
-                 SET nombre = $1, descripcion = $2, precio = $3, stock_actual = $4, categoria_id = $5, etiquetas = $6, imagen = $7 
-                 WHERE id = $8 RETURNING *`,
+                SET nombre = $1, descripcion = $2, precio = $3, stock_actual = $4, categoria_id = $5, etiquetas = $6, imagen = $7 
+                WHERE id = $8 RETURNING *`,
                 [nombre, descripcion, precio, stock_actual, categoria_id, etiquetas, imagenUrl, id]
             );
         } else {
             // Si NO subió imagen, actualizamos solo los datos y conservamos la imagen anterior
             result = await pool.query(
                 `UPDATE productos 
-                 SET nombre = $1, descripcion = $2, precio = $3, stock_actual = $4, categoria_id = $5, etiquetas = $6 
+                SET nombre = $1, descripcion = $2, precio = $3, stock_actual = $4, categoria_id = $5, etiquetas = $6 
                  WHERE id = $7 RETURNING *`,
                 [nombre, descripcion, precio, stock_actual, categoria_id, etiquetas, id]
             );

@@ -1,3 +1,5 @@
+
+//imagencontroller.js
 const pool = require('../config/db');
 
 const subirImagen = async (req, res) => {
