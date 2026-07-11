@@ -24,6 +24,10 @@ export async function renderInventario(container) {
                                 <option value="">Seleccione una categoría...</option>
                             </select>
                             <textarea id="descripcion" class="form-control mb-2" placeholder="Descripción"></textarea>
+
+                            <label class="form-label text-muted small mt-2">Imagen del producto</label>
+                            <input type="file" id="imagen" class="form-control mb-2" accept="image/*">
+                            
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -56,29 +60,38 @@ export async function renderInventario(container) {
     document.getElementById('form-producto').addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('producto-id').value;
-        const data = {
-            nombre: document.getElementById('nombre').value,
-            precio: parseFloat(document.getElementById('precio').value),
-            stock_actual: parseInt(document.getElementById('stock').value),
-            categoria_id: parseInt(document.getElementById('categoria_id').value),
-            descripcion: document.getElementById('descripcion').value
-        };
+        
+        // 1. Creamos un FormData en lugar de un JSON
+        const formData = new FormData();
+        formData.append('nombre', document.getElementById('nombre').value);
+        formData.append('precio', document.getElementById('precio').value);
+        formData.append('stock_actual', document.getElementById('stock').value);
+        formData.append('categoria_id', document.getElementById('categoria_id').value);
+        formData.append('descripcion', document.getElementById('descripcion').value);
+
+        // 2. Capturamos la imagen desde el explorador de archivos
+        const archivoImagen = document.getElementById('imagen').files[0];
+        if (archivoImagen) {
+            formData.append('imagen', archivoImagen); // 'imagen' es el nombre que recibe multer en tu backend
+        }
 
         try {
+            // 3. Enviamos el FormData a tu API
             if (id) {
-                await api.put(`/productos/${id}`, data); 
+                await api.put(`/productos/${id}`, formData); 
             } else {
-                await api.post('/productos', data);
+                await api.post('/productos', formData);
             }
             
+            // 4. Cerramos el modal y recargamos
             const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalProducto'));
             modal.hide();
             
-            e.target.reset();
+            e.target.reset(); // Limpia el formulario (incluyendo el input file)
             document.getElementById('producto-id').value = ''; 
             await cargarTabla(container);
         } catch (err) { 
-            alert("Error: " + err.message); 
+            alert("Error al guardar: " + err.message); 
         }
     });
 }
