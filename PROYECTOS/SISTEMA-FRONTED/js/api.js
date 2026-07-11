@@ -2,7 +2,8 @@ const BASE_URL = 'https://baseii.onrender.com/api';
 
 const getHeaders = () => {
     const token = localStorage.getItem('token');
-    const headers = { 'Content-Type': 'application/json' };
+    // Quitamos el 'Content-Type': 'application/json' por defecto aquí
+    const headers = {}; 
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
@@ -10,13 +11,21 @@ const getHeaders = () => {
 };
 
 async function request(endpoint, method = 'GET', data = null) {
+    const headers = getHeaders();
     const options = {
         method,
-        headers: getHeaders()
+        headers
     };
 
     if (data) {
-        options.body = JSON.stringify(data);
+        // Si la data es un formulario con archivos (FormData), dejamos que el navegador 
+        // ponga el Content-Type automáticamente. Si no, lo forzamos a JSON.
+        if (data instanceof FormData) {
+            options.body = data;
+        } else {
+            headers['Content-Type'] = 'application/json';
+            options.body = JSON.stringify(data);
+        }
     }
 
     try {
@@ -44,5 +53,6 @@ export const api = {
     get: (endpoint) => request(endpoint, 'GET'),
     post: (endpoint, data) => request(endpoint, 'POST', data),
     patch: (endpoint, data) => request(endpoint, 'PATCH', data),
+    put: (endpoint, data) => request(endpoint, 'PUT', data), // Asegúrate de tener PUT si lo usas
     delete: (endpoint) => request(endpoint, 'DELETE')
 };

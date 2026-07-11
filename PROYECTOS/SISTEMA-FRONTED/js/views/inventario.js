@@ -97,12 +97,22 @@ async function cargarCategorias() {
 async function cargarTabla(container) {
     try {
         const productos = await api.get('/productos');
+        
         const tbody = document.getElementById('tabla-productos');
         tbody.innerHTML = productos.map(p => `
             <tr>
+                <!-- NUEVO TD EXCLUSIVO PARA LA IMAGEN -->
+                <td>
+                    <img src="${p.imagen || 'https://via.placeholder.com/50'}" alt="${p.nombre}" 
+                    style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd;">
+                </td>
+                
+                <!-- LOS DEMÁS DATOS -->
                 <td>${p.nombre}</td>
                 <td>S/ ${parseFloat(p.precio).toFixed(2)}</td>
                 <td>${p.stock_actual}</td>
+                
+                <!-- EL TD DE LAS ACCIONES QUEDA SOLO CON LOS BOTONES -->
                 <td>
                     <button class="btn btn-sm btn-outline-primary btn-editar" 
                             data-id="${p.id}" data-nombre="${p.nombre}" 
